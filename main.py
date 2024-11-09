@@ -25,4 +25,20 @@ if args.action == 'add':
     except Exception as e:
         print(e)
 
+if args.action == 'delete':
+    title, task_id = args.title, args.id
+    if not title and not task_id:
+        print('Please provide at least a --title, or an --id')
+
+    if title:
+        try:
+            task_manager.delete_by_title(title)
+        except Exception as e:
+            print(e)
+
+    if task_id:
+        try:
+            task_manager.delete_by_id(task_id)
+        except Exception as e:
+            print(e)
 

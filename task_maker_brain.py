@@ -69,5 +69,5 @@ class TaskManager:
 
 if __name__ == '__main__':
     testing_task_manager = TaskManager()
-    # testing_task_manager.add("test task")
+    testing_task_manager.add("test task")
     testing_task_manager.delete_by_title("test task")
