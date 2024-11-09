@@ -18,27 +18,43 @@ parser.add_argument('-d', '--delete', action='store_true')
 
 args = parser.parse_args()
 
-if args.action == 'add':
-    try:
-        title = args.title
-        task_manager.add(title)
-    except Exception as e:
-        print(e)
+action = args.action
 
-if args.action == 'delete':
-    title, task_id = args.title, args.id
-    if not title and not task_id:
-        print('Please provide at least a --title, or an --id')
+match action:
 
-    if title:
+    case 'add':
         try:
-            task_manager.delete_by_title(title)
+            title = args.title
+            task_manager.add(title)
         except Exception as e:
             print(e)
 
-    if task_id:
-        try:
-            task_manager.delete_by_id(task_id)
-        except Exception as e:
-            print(e)
+    case 'delete':
+        title, task_id = args.title, args.id
+        if not title and not task_id:
+            print('Please provide at least a --title, or an --id')
+        if task_id:
+            try:
+                task_manager.delete(task_id=task_id)
+            except Exception as e:
+                print(e)
+        if title:
+            try:
+                task_manager.delete(task_title=title)
+            except Exception as e:
+                print(e)
 
+    case 'complete':
+        title, task_id = args.title, args.id
+        if not title and not task_id:
+            print('Please provide at least a --title, or an --id')
+        if task_id:
+            try:
+                task_manager.complete(task_id=task_id)
+            except Exception as e:
+                print(e)
+        if title:
+            try:
+                task_manager.complete(task_title=title)
+            except Exception as e:
+                print(e)

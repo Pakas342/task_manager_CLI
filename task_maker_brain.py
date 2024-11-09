@@ -12,6 +12,7 @@ def find_index(seq: list[dict], key: str, value):
 
 class Task:
     """Class for a task"""
+
     def __init__(self, title: str):
         self.title: str = title
         self.created_at: int = int(time.time())
@@ -50,24 +51,39 @@ class TaskManager:
 
         self.update_tasks(tasks)
 
-    def delete_by_id(self, task_id: str):
-        if not task_id:
-            raise TypeError('None task_id given')
+    def delete(self, task_id: str = None, task_title: str = None):
+        if not task_id and not task_title:
+            raise TypeError('None task id or task title given')
         tasks = self.get_tasks()
-        index = find_index(tasks, 'id', task_id)
+
+        if task_id:
+            index = find_index(tasks, 'id', task_id)
+        elif task_title:
+            index = find_index(tasks, 'title', task_title)
+        else:
+            index = None
+
         tasks.pop(index)
         self.update_tasks(tasks)
 
-    def delete_by_title(self, task_title: str):
-        if not task_title:
-            raise TypeError('None task_title given')
+    def complete(self, task_id: str = None, task_title: str = None):
+        if not task_id and not task_title:
+            raise TypeError('None task id or task title given')
         tasks = self.get_tasks()
-        index = find_index(tasks, 'title', task_title)
-        tasks.pop(index)
+
+        if task_id:
+            index = find_index(tasks, 'id', task_id)
+        elif task_title:
+            index = find_index(tasks, 'title', task_title)
+        else:
+            index = None
+
+        tasks[index]['completed'] = True
         self.update_tasks(tasks)
 
 
 if __name__ == '__main__':
     testing_task_manager = TaskManager()
-    testing_task_manager.add("test task")
-    testing_task_manager.delete_by_title("test task")
+    testing_task_manager.add('test task')
+    testing_task_manager.complete('test task')
+    testing_task_manager.delete(task_title='test task')
