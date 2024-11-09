@@ -37,7 +37,7 @@ match action:
                 task_manager.delete(task_id=task_id)
             except Exception as e:
                 print(e)
-        if title:
+        elif title:
             try:
                 task_manager.delete(task_title=title)
             except Exception as e:
@@ -52,14 +52,28 @@ match action:
                 task_manager.complete(task_id=task_id)
             except Exception as e:
                 print(e)
-        if title:
+        elif title:
             try:
                 task_manager.complete(task_title=title)
             except Exception as e:
                 print(e)
 
     case 'read':
-        title, task_id, read_all = args.title, args.id, args.all
+        title, task_id, read_all, completed = args.title, args.id, args.all, args.completed
         if not title and not task_id and not read_all:
             print('Please provide at least a --title, an --id, or --all for reading all the existing tasks')
-
+        if read_all:
+            try:
+                task_manager.read(read_all=read_all, completed=completed)
+            except Exception as e:
+                print(e)
+        elif task_id:
+            try:
+                task_manager.read(task_id=task_id, completed=completed)
+            except Exception as e:
+                print(e)
+        elif title:
+            try:
+                task_manager.read(task_title=title, completed=completed)
+            except Exception as e:
+                print(e)

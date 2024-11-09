@@ -1,5 +1,6 @@
 import json
 import time
+from datetime import datetime
 from uuid import uuid4
 
 
@@ -8,6 +9,13 @@ def find_index(seq: list[dict], key: str, value):
         if dictionary[key] == value:
             return i
     raise ValueError(f'element with {key} "{value}" not found')
+
+
+def print_task(task):
+    return print(f'Task id: {task['id']} - '
+                 f'Task: {task['title']} - '
+                 f'created: {datetime.fromtimestamp(task['created_at'])} - '
+                 f'status: {"completed" if task['completed'] else "uncompleted"}')
 
 
 class Task:
@@ -93,7 +101,21 @@ class TaskManager:
         self.update_tasks(tasks)
         self.update_tasks(completed_tasks, completed=True)
 
+    def read(self, task_id: str = None, task_title: str = None, read_all: bool = False, completed: bool = False):
+        if not task_id and not task_title and not read_all:
+            raise TypeError('None task id, task title, or read all given')
+        tasks = self.get_tasks(completed=completed)
+        if task_id:
+            index = find_index(tasks, 'id', task_id)
+            print_task(tasks[index])
+        elif task_title:
+            index = find_index(tasks, 'title', task_title)
+            print_task(tasks[index])
+        else:
+            return [print_task(task) for task in tasks]
+
 
 if __name__ == '__main__':
     testing_task_manager = TaskManager()
-    testing_task_manager.complete(task_title='test task')
+    testing_task_manager.read(task_title='test task 2', completed=True)
+    testing_task_manager.read(read_all=True)
