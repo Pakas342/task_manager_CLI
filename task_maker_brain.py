@@ -11,7 +11,7 @@ def find_index(seq: list[dict], key: str, value):
 
 
 class Task:
-    """Class for a task"""
+    """dataclass for a task"""
 
     def __init__(self, title: str):
         self.title: str = title
@@ -23,17 +23,20 @@ class Task:
 class TaskManager:
     def __init__(self):
         self.file = '.tasks.json'
+        self.completed_file = '.completed_tasks.json'
 
-    def get_tasks(self):
-        with open(self.file, 'r') as f:
+    def get_tasks(self, completed: bool = False):
+        file = self.file if not completed else self.completed_file
+        with open(file, 'r') as f:
             try:
                 tasks = json.load(f)
             except json.JSONDecodeError:
                 tasks = []
             return tasks
 
-    def update_tasks(self, tasks: json):
-        with open(self.file, 'w') as f:
+    def update_tasks(self, tasks: json, completed: bool = False):
+        file = self.file if not completed else self.completed_file
+        with open(file, 'w') as f:
             json.dump(tasks, f)
 
     def add(self, task_title):
@@ -79,11 +82,18 @@ class TaskManager:
             index = None
 
         tasks[index]['completed'] = True
+        completed_task = tasks.pop(index)
+
+        try:
+            completed_tasks = self.get_tasks(completed=True)
+        except (FileNotFoundError, json.JSONDecodeError):
+            completed_tasks = []
+        completed_tasks.append(completed_task)
+
         self.update_tasks(tasks)
+        self.update_tasks(completed_tasks, completed=True)
 
 
 if __name__ == '__main__':
     testing_task_manager = TaskManager()
-    testing_task_manager.add('test task')
-    testing_task_manager.complete('test task')
-    testing_task_manager.delete(task_title='test task')
+    testing_task_manager.complete(task_title='test task')

@@ -11,10 +11,9 @@ task_manager = TaskManager()
 
 parser.add_argument('action', choices=['add', 'delete', 'complete', 'read'])
 parser.add_argument('-i', '--id')
-parser.add_argument('-a', '--all')
+parser.add_argument('-a', '--all', action='store_true')
 parser.add_argument('-t', '--title')
-parser.add_argument('-c', '--complete', action='store_true')
-parser.add_argument('-d', '--delete', action='store_true')
+parser.add_argument('-c', '--completed', action='store_true')
 
 args = parser.parse_args()
 
@@ -58,3 +57,9 @@ match action:
                 task_manager.complete(task_title=title)
             except Exception as e:
                 print(e)
+
+    case 'read':
+        title, task_id, read_all = args.title, args.id, args.all
+        if not title and not task_id and not read_all:
+            print('Please provide at least a --title, an --id, or --all for reading all the existing tasks')
+
