@@ -2,6 +2,7 @@ import json
 import time
 from datetime import datetime
 from uuid import uuid4
+from pathlib import Path
 
 
 def find_index(seq: list[dict], key: str, value):
@@ -30,17 +31,20 @@ class Task:
 
 class TaskManager:
     def __init__(self):
-        self.file = '.tasks.json'
-        self.completed_file = '.completed_tasks.json'
+        self.file = Path.cwd() / '.tasks.json'
+        self.completed_file = Path.cwd() / '.completed_tasks.json'
 
     def get_tasks(self, completed: bool = False):
         file = self.file if not completed else self.completed_file
-        with open(file, 'r') as f:
-            try:
-                tasks = json.load(f)
-            except json.JSONDecodeError:
-                tasks = []
-            return tasks
+        try:
+            with open(file, 'r') as f:
+                try:
+                    tasks = json.load(f)
+                except json.JSONDecodeError:
+                    tasks = []
+        except FileNotFoundError:
+            tasks = []
+        return tasks
 
     def update_tasks(self, tasks: json, completed: bool = False):
         file = self.file if not completed else self.completed_file

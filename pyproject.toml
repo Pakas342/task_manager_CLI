@@ -1,0 +1,10 @@
+[project]
+name = "taskmanager-pakas342"
+version = "0.1.0"
+description = "Simple task manager"
+requires-python = ">=3.7"
+[project.scripts]
+taskman = "main:main"  # or whatever command name you want
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
