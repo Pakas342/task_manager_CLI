@@ -32,24 +32,33 @@ class Task:
 class TaskManager:
     def __init__(self):
         self.file = Path.cwd() / '.tasks.json'
-        self.completed_file = Path.cwd() / '.completed_tasks.json'
 
     def get_tasks(self, completed: bool = False):
-        file = self.file if not completed else self.completed_file
+        file = self.file
         try:
             with open(file, 'r') as f:
                 try:
-                    tasks = json.load(f)
+                    task_types = json.load(f)
+                    tasks = task_types['uncompleted_tasks'] if not completed else task_types['completed_tasks']
                 except json.JSONDecodeError:
                     tasks = []
         except FileNotFoundError:
             tasks = []
         return tasks
 
-    def update_tasks(self, tasks: json, completed: bool = False):
-        file = self.file if not completed else self.completed_file
+    def update_tasks(self, uncompleted_tasks: json = None, completed_tasks: json = None):
+        file = self.file
+        if uncompleted_tasks is None:
+            uncompleted_tasks = self.get_tasks()
+        if completed_tasks is None:
+            completed_tasks = self.get_tasks(completed=True)
+        task_types = {
+            'uncompleted_tasks': uncompleted_tasks,
+            'completed_tasks': completed_tasks
+        }
         with open(file, 'w') as f:
-            json.dump(tasks, f)
+
+            json.dump(task_types, f)
 
     def add(self, task_title):
         if not task_title:
@@ -64,7 +73,7 @@ class TaskManager:
         new_task = Task(task_title)
         tasks.append(new_task.__dict__)
 
-        self.update_tasks(tasks)
+        self.update_tasks(uncompleted_tasks=tasks)
 
     def delete(self, task_id: str = None, task_title: str = None):
         if not task_id and not task_title:
@@ -79,22 +88,22 @@ class TaskManager:
             index = None
 
         tasks.pop(index)
-        self.update_tasks(tasks)
+        self.update_tasks(completed_tasks=tasks)
 
     def complete(self, task_id: str = None, task_title: str = None):
         if not task_id and not task_title:
             raise TypeError('None task id or task title given')
-        tasks = self.get_tasks()
+        uncompleted_tasks = self.get_tasks()
 
         if task_id:
-            index = find_index(tasks, 'id', task_id)
+            index = find_index(uncompleted_tasks, 'id', task_id)
         elif task_title:
-            index = find_index(tasks, 'title', task_title)
+            index = find_index(uncompleted_tasks, 'title', task_title)
         else:
             index = None
 
-        tasks[index]['completed'] = True
-        completed_task = tasks.pop(index)
+        uncompleted_tasks[index]['completed'] = True
+        completed_task = uncompleted_tasks.pop(index)
 
         try:
             completed_tasks = self.get_tasks(completed=True)
@@ -102,8 +111,7 @@ class TaskManager:
             completed_tasks = []
         completed_tasks.append(completed_task)
 
-        self.update_tasks(tasks)
-        self.update_tasks(completed_tasks, completed=True)
+        self.update_tasks(uncompleted_tasks=uncompleted_tasks, completed_tasks=completed_tasks)
 
     def read(self, task_id: str = None, task_title: str = None, read_all: bool = False, completed: bool = False):
         if not task_id and not task_title and not read_all:
