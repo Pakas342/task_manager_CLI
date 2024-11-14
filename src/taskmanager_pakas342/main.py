@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 
-from task_maker_brain import TaskManager
+from taskmanager_pakas342.task_maker_brain import TaskManager
 
 # this is an example comment
 
